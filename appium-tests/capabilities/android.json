@@ -1,0 +1,10 @@
+{
+  "platformName": "Android",
+  "platformVersion": "13",
+  "deviceName": "emulator-5554",
+  "automationName": "UiAutomator2",
+  "appPackage": "com.saucelabs.mydemoapp.android",
+  "appActivity": "com.saucelabs.mydemoapp.android.view.activities.SplashActivity",
+  "noReset": true,
+  "newCommandTimeout": 60000
+}
