@@ -1,0 +1,189 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<hierarchy rotation="0">
+    <node bounds="[0,0][1080,2400]" checkable="false" checked="false" class="android.widget.FrameLayout"
+        clickable="false" content-desc="" enabled="true" focusable="false"
+        focused="false" index="0" long-clickable="false" package="com.saucelabs.mydemoapp.android" password="false"
+        resource-id="" scrollable="false" selected="false" text="">
+        <node bounds="[0,0][1080,2337]" checkable="false" checked="false" class="android.widget.LinearLayout"
+            clickable="false" content-desc="" enabled="true"
+            focusable="false" focused="false" index="0" long-clickable="false" package="com.saucelabs.mydemoapp.android"
+            password="false" resource-id="" scrollable="false" selected="false"
+            text="">
+            <node bounds="[0,63][1080,2337]" checkable="false" checked="false" class="android.widget.FrameLayout"
+                clickable="false" content-desc="" enabled="true"
+                focusable="false" focused="false" index="0" long-clickable="false" package="com.saucelabs.mydemoapp.android"
+                password="false" resource-id="" scrollable="false" selected="false"
+                text="">
+                <node bounds="[0,63][1080,2337]" checkable="false"
+                    checked="false"
+                    class="android.widget.LinearLayout" clickable="false"
+                    content-desc="" enabled="true" focusable="false" focused="false"
+                    index="0" long-clickable="false" package="com.saucelabs.mydemoapp.android" password="false"
+                    resource-id="com.saucelabs.mydemoapp.android:id/action_bar_root" scrollable="false" selected="false"
+                    text="">
+                    <node bounds="[0,63][1080,2337]" checkable="false" checked="false"
+                        class="android.widget.FrameLayout" clickable="false"
+                        content-desc="" enabled="true" focusable="false" focused="false"
+                        index="0" long-clickable="false" package="com.saucelabs.mydemoapp.android" password="false"
+                        resource-id="android:id/content" scrollable="false" selected="false"
+                        text="">
+                        <node bounds="[0,63][1080,2337]" checkable="false"
+                            checked="false"
+                            class="androidx.drawerlayout.widget.DrawerLayout"
+                            clickable="false" content-desc=""
+                            enabled="true" focusable="false" focused="false" index="0"
+                            long-clickable="false" package="com.saucelabs.mydemoapp.android" password="false"
+                            resource-id="com.saucelabs.mydemoapp.android:id/container" scrollable="false" selected="false"
+                            text="">
+                            <node bounds="[0,63][1080,2337]" checkable="false" checked="false" class="android.view.ViewGroup"
+                                clickable="false" content-desc=""
+                                enabled="true" focusable="false" focused="false" index="0"
+                                long-clickable="false" package="com.saucelabs.mydemoapp.android" password="false"
+                                resource-id="" scrollable="false" selected="false"
+                                text="">
+                                <node bounds="[0,63][1080,194]" checkable="false"
+                                    checked="false"
+                                    class="android.view.ViewGroup"
+                                    clickable="false" content-desc=""
+                                    enabled="true" focusable="false" focused="false"
+                                    index="0" long-clickable="false" package="com.saucelabs.mydemoapp.android"
+                                    password="false" resource-id="com.saucelabs.mydemoapp.android:id/header" scrollable="false"
+                                    selected="false" text="">
+                                    <node bounds="[0,102][1080,155]" checkable="false"
+                                        checked="false"
+                                        class="android.widget.ImageView"
+                                        clickable="false"
+                                        content-desc="App logo and name" enabled="true"
+                                        focusable="false" focused="false" index="0"
+                                        long-clickable="false" package="com.saucelabs.mydemoapp.android" password="false"
+                                        resource-id="com.saucelabs.mydemoapp.android:id/mTvTitle" scrollable="false" selected="false"
+                                        text="" />
+                                    <node bounds="[32,89][111,168]" checkable="false"
+                                        checked="false"
+                                        class="android.widget.ImageView"
+                                        clickable="true"
+                                        content-desc="View menu" enabled="true" focusable="true"
+                                        focused="false" index="1" long-clickable="false"
+                                        package="com.saucelabs.mydemoapp.android" password="false" resource-id="com.saucelabs.mydemoapp.android:id/menuIV"
+                                        scrollable="false" selected="false"
+                                        text="" />
+                                    <node bounds="[969,89][1048,168]" checkable="false"
+                                        checked="false"
+                                        class="android.widget.RelativeLayout"
+                                        clickable="true"
+                                        content-desc="View cart" enabled="true" focusable="true"
+                                        focused="false" index="2" long-clickable="false"
+                                        package="com.saucelabs.mydemoapp.android" password="false" resource-id="com.saucelabs.mydemoapp.android:id/cartRL"
+                                        scrollable="false" selected="false"
+                                        text="">
+                                        <node bounds="[969,97][1027,160]" checkable="false"
+                                            checked="false"
+                                            class="android.widget.ImageView"
+                                            clickable="false"
+                                            content-desc="Displays number of items in your cart"
+                                            enabled="true" focusable="false" focused="false"
+                                            index="0" long-clickable="false" package="com.saucelabs.mydemoapp.android"
+                                            password="false" resource-id="com.saucelabs.mydemoapp.android:id/cartIV"
+                                            scrollable="false" selected="false"
+                                            text="" />
+                                    </node>
+                                    <node bounds="[0,193][1080,194]" checkable="false" checked="false" class="android.view.View"
+                                        clickable="false" content-desc=""
+                                        enabled="true" focusable="false" focused="false"
+                                        index="3" long-clickable="false" package="com.saucelabs.mydemoapp.android"
+                                        password="false" resource-id="" scrollable="false"
+                                        selected="false" text="" />
+                                </node>
+                                <node bounds="[0,194][1080,2337]" checkable="false"
+                                    checked="false"
+                                    class="android.widget.FrameLayout"
+                                    clickable="false"
+                                    content-desc="Container for fragments" enabled="true"
+                                    focusable="false" focused="false" index="1"
+                                    long-clickable="false" package="com.saucelabs.mydemoapp.android" password="false"
+                                    resource-id="com.saucelabs.mydemoapp.android:id/fragment_container" scrollable="false" selected="false"
+                                    text="">
+                                    <node bounds="[0,194][1080,2337]" checkable="false" checked="false"
+                                        class="android.view.ViewGroup"
+                                        clickable="false" content-desc=""
+                                        enabled="true" focusable="false" focused="false"
+                                        index="0" long-clickable="false" package="com.saucelabs.mydemoapp.android"
+                                        password="false" resource-id="" scrollable="false"
+                                        selected="false" text="">
+                                        <node bounds="[0,194][1080,2337]" checkable="false"
+                                            checked="false"
+                                            class="android.view.ViewGroup"
+                                            clickable="false"
+                                            content-desc="" enabled="true" focusable="false"
+                                            focused="false" index="0" long-clickable="false"
+                                            package="com.saucelabs.mydemoapp.android" password="false"
+                                            resource-id="com.saucelabs.mydemoapp.android:id/noItemCL" scrollable="false" selected="false"
+                                            text="">
+                                            <node bounds="[412,299][668,384]" checkable="false"
+                                                checked="false"
+                                                class="android.widget.TextView"
+                                                clickable="false"
+                                                content-desc="" enabled="true" focusable="false"
+                                                focused="false" index="0" long-clickable="false"
+                                                package="com.saucelabs.mydemoapp.android" password="false"
+                                                resource-id="com.saucelabs.mydemoapp.android:id/noItemTitleTV" scrollable="false"
+                                                selected="false" text="No Items" />
+                                            <node bounds="[0,384][1080,940]" checkable="false"
+                                                checked="false"
+                                                class="android.widget.LinearLayout"
+                                                clickable="false"
+                                                content-desc="" enabled="true" focusable="false"
+                                                focused="false" index="1" long-clickable="false"
+                                                package="com.saucelabs.mydemoapp.android" password="false"
+                                                resource-id="com.saucelabs.mydemoapp.android:id/cartInfoLL" scrollable="false"
+                                                selected="false" text="">
+                                                <node bounds="[414,489][666,741]" checkable="false" checked="false"
+                                                    class="android.widget.ImageView"
+                                                    clickable="false"
+                                                    content-desc="" enabled="true"
+                                                    focusable="false" focused="false" index="0"
+                                                    long-clickable="false" package="com.saucelabs.mydemoapp.android"
+                                                    password="false" resource-id=""
+                                                    scrollable="false" selected="false"
+                                                    text="" />
+                                                <node bounds="[53,846][1027,940]"
+                                                    checkable="false"
+                                                    checked="false" class="android.widget.TextView"
+                                                    clickable="false"
+                                                    content-desc="" enabled="true"
+                                                    focusable="false" focused="false" index="1"
+                                                    long-clickable="false" package="com.saucelabs.mydemoapp.android"
+                                                    password="false" resource-id=""
+                                                    scrollable="false" selected="false"
+                                                    text="Oh no! Your cart is empty. Fill it up with swag to complete your purchase." />
+                                            </node>
+                                            <node bounds="[278,1019][803,1171]" checkable="false"
+                                                checked="false"
+                                                class="android.widget.Button"
+                                                clickable="true"
+                                                content-desc="" enabled="true" focusable="true"
+                                                focused="false" index="2" long-clickable="false"
+                                                package="com.saucelabs.mydemoapp.android" password="false"
+                                                resource-id="com.saucelabs.mydemoapp.android:id/shoppingBt" scrollable="false"
+                                                selected="false" text="Go Shopping" />
+                                        </node>
+                                    </node>
+                                </node>
+                            </node>
+                        </node>
+                    </node>
+                </node>
+            </node>
+        </node>
+        <node bounds="[0,0][1080,63]" checkable="false" checked="false"
+            class="android.view.View" clickable="false" content-desc=""
+            enabled="true" focusable="false" focused="false" index="1" long-clickable="false"
+            package="com.saucelabs.mydemoapp.android" password="false" resource-id="android:id/statusBarBackground" scrollable="false"
+            selected="false" text="" />
+        <node bounds="[0,2337][1080,2400]" checkable="false" checked="false"
+            class="android.view.View" clickable="false" content-desc=""
+            enabled="true" focusable="false" focused="false" index="2" long-clickable="false"
+            package="com.saucelabs.mydemoapp.android" password="false" resource-id="android:id/navigationBarBackground" scrollable="false"
+            selected="false" text="" />
+    </node>
+</hierarchy>

@@ -27,9 +27,12 @@
 
 ## Screens Covered
 - [x] Home
-- [ ] Cart
+- [x] Cart
 - [ ] Checkout
 - [ ] Login
+
+## Tests Covered
+- [x] Add two products to cart and verify display
 
 ## Run Command
 ```bash

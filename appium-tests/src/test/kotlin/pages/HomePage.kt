@@ -28,6 +28,9 @@ class HomePage(private val driver: AndroidDriver) {
     @AndroidFindBy(id = "com.saucelabs.mydemoapp.android:id/productRV")
     private lateinit var productsRecyclerView: WebElement
 
+    @AndroidFindBy(accessibility = "Product Image")
+    private lateinit var firstProductImage: WebElement
+
     // ── Actions ──────────────────────────────────────────────────────────────
     fun isDisplayed(): Boolean =
         runCatching {
@@ -47,6 +50,28 @@ class HomePage(private val driver: AndroidDriver) {
             wait.until(ExpectedConditions.visibilityOf(productsTitle))
             productsTitle.text == "Products"
         }.getOrDefault(false)
+
+    fun tapFirstProduct(): ProductDetailPage {
+        wait.until(ExpectedConditions.elementToBeClickable(firstProductImage))
+        firstProductImage.click()
+        return ProductDetailPage(driver)
+    }
+
+    fun tapProductByInstance(index: Int): ProductDetailPage {
+        val product = wait.until(ExpectedConditions.elementToBeClickable(
+            AppiumBy.androidUIAutomator("new UiSelector().description(\"Product Image\").instance($index)")
+        ))
+        product.click()
+        return ProductDetailPage(driver)
+    }
+
+    fun tapCart(): CartPage {
+        val cartButton = wait.until(ExpectedConditions.elementToBeClickable(
+            AppiumBy.accessibilityId("View cart")
+        ))
+        cartButton.click()
+        return CartPage(driver)
+    }
 
     fun isProductsListVisible(): Boolean =
         runCatching {

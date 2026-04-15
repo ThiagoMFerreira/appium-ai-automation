@@ -4,8 +4,12 @@ import io.appium.java_client.android.AndroidDriver
 import io.appium.java_client.android.options.UiAutomator2Options
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import org.openqa.selenium.OutputType
+import java.io.File
 import java.net.URL
 import java.time.Duration
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 open class BaseTest {
 
@@ -33,6 +37,16 @@ open class BaseTest {
 
     @AfterEach
     fun tearDown() {
+        takeScreenshot("test_teardown")
         if (::driver.isInitialized) driver.quit()
+    }
+
+    fun takeScreenshot(fileName: String) {
+        if (::driver.isInitialized) {
+            val screenshot = driver.getScreenshotAs(OutputType.FILE)
+            val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
+            val destFile = File("screenshot-failures/${fileName}_${timestamp}.png")
+            screenshot.copyTo(destFile)
+        }
     }
 }

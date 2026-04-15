@@ -21,7 +21,7 @@ class ProductDetailPage(private val driver: AndroidDriver) {
     @AndroidFindBy(id = "com.saucelabs.mydemoapp.android:id/productTV")
     private lateinit var productTitle: WebElement
 
-    @AndroidFindBy(id = "com.saucelabs.mydemoapp.android:id/cartBt")
+    @AndroidFindBy(accessibility = "Tap to add product to cart")
     private lateinit var addToCartButton: WebElement
 
     @AndroidFindBy(id = "com.saucelabs.mydemoapp.android:id/plusIV")
@@ -33,6 +33,7 @@ class ProductDetailPage(private val driver: AndroidDriver) {
     fun isDisplayed(): Boolean =
         runCatching {
             wait.until(ExpectedConditions.visibilityOf(productTitle))
+            wait.until(ExpectedConditions.visibilityOf(addToCartButton))
             true
         }.getOrDefault(false)
 
@@ -47,6 +48,12 @@ class ProductDetailPage(private val driver: AndroidDriver) {
             wait.until(ExpectedConditions.visibilityOf(quantityText))
             quantityText.text.toIntOrNull() ?: 0
         }.getOrDefault(0)
+
+    fun tapAddToCart(): ProductDetailPage {
+        wait.until(ExpectedConditions.elementToBeClickable(addToCartButton))
+        addToCartButton.click()
+        return this
+    }
 
     fun increaseQuantity() {
         wait.until(ExpectedConditions.elementToBeClickable(increaseQuantityButton)).click()

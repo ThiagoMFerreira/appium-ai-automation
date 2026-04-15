@@ -1,43 +1,38 @@
-# Appium UI Automation — Agent Reference
+# Appium Guideline — Agent Instructions
 
-> **Purpose:** Guia completo para gerar testes Appium funcionais com locators reais.
-> Linguagem padrão: **Kotlin + JUnit5 + Appium Java Client 9.x**
-> Plataforma primária: **Android (UiAutomator2)** | iOS: ver seção de referência no final.
+> **Purpose:** Instructions for agents to generate functional Appium tests with real locators extracted from the app.
+> Default language: **Kotlin + JUnit5 + Appium Java Client 9.x**
+> Primary platform: **Android (UiAutomator2)** | iOS: see reference section at the end.
 >
-> **Regra fundamental:** Nunca inventar locators. Sempre extrair do app real via inspeção ao vivo.
+> **Fundamental rule:** Never invent locators. Always extract from the real app using `appium-inspector`.
 
 ---
 
 ## 🔎 Pre-check — APPIUM_CONTEXT.md
 
-Before starting Phase 1, verify whether `APPIUM_CONTEXT.md` already exists at the project root.
+Before generating any tests, check if `APPIUM_CONTEXT.md` exists at the project root.
 
-- If `APPIUM_CONTEXT.md` exists: proceed directly to Phase 1.
-- If `APPIUM_CONTEXT.md` does not exist: use the `appium-setup` skill to complete environment setup first.
+- If it exists: proceed directly to generation.
+- If it does not exist: use the `appium-setup` skill to configure the environment first.
 
-This ensures the environment is properly configured before creating tests.
+This ensures the environment is validated before generating code.
 
-## 🔍 Phase 1 — Live Screen Inspection
+## 🔍 Live Screen Inspection
 
-**Never generate locators from imagination. Always extract from the real app.**
+**Never generate locators from imagination. Always extract from the real app using `appium-inspector`.**
 
-### Pre-requisite: Start every new automated scenario from a known Home state
+### Pre-requisite: Start every new test scenario from a known Home state
 
-When asked to create a new test scenario, do not assume the app is already on the correct screen.
-Always start from a clean, known state and confirm you are on the Home screen before navigating.
+When generating a new test, do not assume the app is on the correct screen.
+Always start from a clean state and confirm you are on the Home screen before navigating.
 
-- For manual execution, close and relaunch the app before the scenario:
-  ```bash
-  adb shell am force-stop {{APP_PACKAGE}}
-  adb shell monkey -p {{APP_PACKAGE}} -c android.intent.category.LAUNCHER 1
-  ```
 - For automation, prefer a clean app state:
-  - set `noReset` to `false`
-  - set `fullReset` to `false` if reinstall is not needed
-  - ensure the driver session starts from the app launch activity
-- Confirm Home screen using the existing Home screen locators before continuing.
+  - Set `noReset` to `false`
+  - Set `fullReset` to `false` if reinstall is not needed
+  - Ensure the driver session starts from the app launch activity
+- Confirm Home screen using existing locators before continuing.
 - If the app may be on a different screen, do not continue until Home is explicitly verified.
-
+**Navigation Rule:** After any navigation action (tap, back, swipe), always verify the target page with `page.isDisplayed()` before proceeding. Never assume navigation succeeded.
 This makes each new scenario reliable and prevents state leakage from previous tests.
 
 ### Step 1.1 — Get the app's package and activity
@@ -102,16 +97,17 @@ Record: `appPackage` and `appActivity`.
 
 **Important:** each dump captures only the currently visible screen.
 Generate a separate XML for each screen and name it clearly, for example `home_screen_dump.xml`, `cart_screen_dump.xml`, `checkout_screen_dump.xml`, or `login_screen_dump.xml`.
+Save all dumps in the `appium-tests/dumps/` folder for organization.
 
 ```bash
 # Navigate to the screen to test, then:
 adb exec-out uiautomator dump /dev/tty 2>/dev/null | cat
 
-# Save to file for easier processing:
-adb exec-out uiautomator dump /dev/tty 2>/dev/null > home_screen_dump.xml
+# Save to file for easier processing (in appium-tests/dumps/):
+adb exec-out uiautomator dump /dev/tty 2>/dev/null > appium-tests/dumps/home_screen_dump.xml
 ```
 
-If you change screens, dump again with a new filename.
+If you change screens, dump again with a new filename in the same folder.
 
 ### Step 1.3 — Parse the XML for locators
 
@@ -141,6 +137,14 @@ Apply in this exact order. Stop at the first that applies:
 | 5 ❌ NEVER | Absolute XPath | Breaks on any layout change |
 | 6 ❌ NEVER | Pixel coordinates | Breaks on any screen size |
 
+### Step 1.5 — Clickability Rule (CRITICAL)
+
+When selecting a locator for an interaction (click/tap), **always** ensure the target node has the property `clickable="true"`.
+
+- **Problem:** Many nodes (especially `TextView`) have the text you want but are `clickable="false"`. Clicking them will result in a "silent failure" where the test continues but nothing happens in the app.
+- **Solution:** If the desired node is not clickable, navigate up the hierarchy (parent/ancestor) or down (child) to find the node that actually handles the click.
+- **Example:** Instead of clicking the `TextView` with the product name, click the parent `ViewGroup` or the sibling `ImageView` that has `clickable="true"`.
+
 ---
 
 ## 🏗️ Phase 2 — Project Structure
@@ -159,7 +163,7 @@ appium-tests/
 │               └── LoginTest.kt         ← Test scenarios
 └── capabilities/
     ├── android.json
-    └── ios.json                         ← future
+    └── ios.json                         ← future    
 ```
 
 ---
@@ -373,23 +377,10 @@ driver.findElement(AppiumBy.androidUIAutomator(
 
 ## 🚀 Phase 7 — Running the Tests
 
-```bash
-# All tests
-./gradlew test
+To run the tests and analyze results, follow the instructions in the `appium-runner` skill.
+This ensures proper environment preparation, clean execution, and standardized failure analysis.
 
-# Specific class
-./gradlew test --tests "tests.LoginTest"
-
-# Verbose
-./gradlew test --info
-
-# Report: build/reports/tests/test/index.html
-```
-
-**Before each run:**
-- [ ] `adb devices` shows a device
-- [ ] `curl http://localhost:4723/status` returns OK
-- [ ] App is installed (`adb shell pm list packages | grep yourpackage`)
+> **See:** `.skills/appium-runner/SKILL.md`
 
 ---
 
@@ -403,6 +394,7 @@ driver.findElement(AppiumBy.androidUIAutomator(
 | Logic/assertions in Page Objects | Tests become unreadable | Pages = actions only; tests = assertions |
 | `driver.findElement` without wait | Race condition | Always wrap in `WebDriverWait` |
 | `noReset: false` in every test | Slow — reinstalls app every time | Use `noReset: true`, reset state in `@BeforeEach` |
+| Clicking non-clickable nodes | Silent failure (no action triggered) | Use `clickable="true"` nodes (check XML) |
 
 ---
 

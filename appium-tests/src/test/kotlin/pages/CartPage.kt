@@ -21,9 +21,15 @@ class CartPage(private val driver: AndroidDriver) {
     @AndroidFindBy(id = "com.saucelabs.mydemoapp.android:id/noItemTitleTV")
     private lateinit var emptyCartLabel: WebElement
 
+    @AndroidFindBy(xpath = "//android.widget.TextView[@text='My Cart']")
+    private lateinit var cartTitle: WebElement
+
+    @AndroidFindBy(accessibility = "Confirms products for checkout")
+    private lateinit var checkoutButton: WebElement
+
     fun isDisplayed(): Boolean =
         runCatching {
-            wait.until(ExpectedConditions.visibilityOf(emptyCartLabel))
+            wait.until(ExpectedConditions.visibilityOf(cartTitle))
             true
         }.getOrDefault(false)
 
@@ -38,5 +44,12 @@ class CartPage(private val driver: AndroidDriver) {
             AppiumBy.androidUIAutomator("new UiSelector().textContains(\"$productName\")")
         )
         return matchingElements.isNotEmpty()
+    }
+
+    fun getCartItemCount(): Int {
+        val cartItems = driver.findElements(
+            AppiumBy.id("com.saucelabs.mydemoapp.android:id/titleTV")
+        )
+        return cartItems.size
     }
 }

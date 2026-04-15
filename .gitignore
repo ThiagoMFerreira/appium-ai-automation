@@ -1,8 +1,7 @@
 *.apk
-*.xml
-*.py
 .idea/
 .gradle/
 build/
 local.properties
 .DS_Store
+appium-tests/screenshot-failures/*
