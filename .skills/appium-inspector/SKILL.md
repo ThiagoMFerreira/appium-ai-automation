@@ -30,10 +30,11 @@ When locators are needed for a screen:
 1. **Identify Screen:** Determine the canonical name for the screen (e.g., `HomeScreen`).
 2. **Check Existence:**
    - If `appium-tests/dumps/HomeScreen.xml` **does not exist**:
-     - Run: `adb exec-out uiautomator dump /dev/tty 2>/dev/null > appium-tests/dumps/HomeScreen.xml`
+     - Create directory if doesn't exist: `mkdir -p appium-tests/dumps`
+     - Run and save: `adb exec-out uiautomator dump /dev/tty 2>/dev/null > appium-tests/dumps/HomeScreen.xml`
    - If it **already exists**:
      - Create temp directory: `mkdir -p appium-tests/dumps/tmp`
-     - Run: `adb exec-out uiautomator dump /dev/tty 2>/dev/null > appium-tests/dumps/tmp/HomeScreen_eval.xml`
+     - Run and save evaluation: `adb exec-out uiautomator dump /dev/tty 2>/dev/null > appium-tests/dumps/tmp/HomeScreen_eval.xml`
      - **Compare:** Compare structure/IDs. If identical to the official dump, delete the `_eval.xml` and use the official one.
      - **Conditional Update:** If different, proceed using the `_eval.xml`. If this new dump leads to a successful test fix, **overwrite** the official `appium-tests/dumps/HomeScreen.xml` with it.
 

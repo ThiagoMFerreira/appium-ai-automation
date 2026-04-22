@@ -4,6 +4,9 @@ import io.appium.java_client.android.AndroidDriver
 import io.appium.java_client.android.options.UiAutomator2Options
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.extension.ExtensionContext
+import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.api.extension.TestWatcher
 import org.openqa.selenium.OutputType
 import java.io.File
 import java.net.URL
@@ -15,10 +18,18 @@ open class BaseTest {
 
     protected lateinit var driver: AndroidDriver
 
+    @JvmField
+    @RegisterExtension
+    val watcher = object : TestWatcher {
+        override fun testFailed(context: ExtensionContext, cause: Throwable?) {
+            takeScreenshot("failed_${context.displayName}")
+        }
+    }
+
     @BeforeEach
     fun setUp() {
         // Configurar variáveis de ambiente para Appium
-        System.setProperty("ANDROID_SDK_ROOT", "/Users/tferreira/Library/Android/sdk")
+        System.setProperty("ANDROID_SDK_ROOT", "/Users/userName/Library/Android/sdk")
 
         val options = UiAutomator2Options().apply {
             setPlatformName("Android")
@@ -37,7 +48,6 @@ open class BaseTest {
 
     @AfterEach
     fun tearDown() {
-        takeScreenshot("test_teardown")
         if (::driver.isInitialized) driver.quit()
     }
 

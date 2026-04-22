@@ -27,12 +27,17 @@
 
 ## Screens Covered
 - [x] Home
+- [x] Product Detail
 - [x] Cart
+- [x] Webview
 - [ ] Checkout
 - [ ] Login
 
 ## Tests Covered
-- [x] Add two products to cart and verify display
+- [x] Add two products to cart and verify display (AddTwoProductsToCartTest)
+- [x] App launch and home screen validation (AppLaunchTest)
+- [x] Single product cart flow (CartFlowTest)
+- [x] Open web view and verify elements (WebViewTest)
 
 ## Run Command
 ```bash

@@ -31,7 +31,35 @@ class HomePage(private val driver: AndroidDriver) {
     @AndroidFindBy(accessibility = "Product Image")
     private lateinit var firstProductImage: WebElement
 
+    @AndroidFindBy(id = "com.saucelabs.mydemoapp.android:id/menuIV")
+    private lateinit var menuButton: WebElement
+
+    @AndroidFindBy(xpath = "//android.widget.TextView[@text='About']")
+    private lateinit var aboutMenuItem: WebElement
+
+    @AndroidFindBy(xpath = "//android.widget.TextView[@text='WebView']")
+    private lateinit var webViewMenuItem: WebElement
+
     // ── Actions ──────────────────────────────────────────────────────────────
+    fun openMenu() {
+        wait.until(ExpectedConditions.elementToBeClickable(menuButton))
+        menuButton.click()
+    }
+
+    fun tapAbout(): AboutPage {
+        openMenu()
+        wait.until(ExpectedConditions.elementToBeClickable(aboutMenuItem))
+        aboutMenuItem.click()
+        return AboutPage(driver)
+    }
+
+    fun tapWebView(): WebViewPage {
+        openMenu()
+        wait.until(ExpectedConditions.elementToBeClickable(webViewMenuItem))
+        webViewMenuItem.click()
+        return WebViewPage(driver)
+    }
+
     fun isDisplayed(): Boolean =
         runCatching {
             wait.until(ExpectedConditions.visibilityOf(productsTitle))

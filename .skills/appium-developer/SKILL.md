@@ -85,4 +85,8 @@ class HomeTest : BaseTest() {
 - **Test Refactoring**: Whenever you refactor existing tests (e.g., to improve code quality, readability, or alignment with these standards), you **MUST** execute the modified tests via `appium-runner` to confirm they still pass.
 - **Page Object Updates**: If you modify a Page Object class (locators or methods), you **MUST** identify all tests that use this class (using `find_usages`) and execute them to ensure no regressions were introduced.
 
+### Step 9 — Finalize & Document
+- **Update APPIUM_CONTEXT.md**: Once the tests are passing and the code is finalized, you **MUST** update `APPIUM_CONTEXT.md` to reflect the new state of the project. This includes adding new mapped screens, scenarios, or updating known issues.
+
 This ensures complete generation and maintenance without manual intervention.
+

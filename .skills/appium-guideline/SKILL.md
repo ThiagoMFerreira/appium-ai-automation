@@ -32,8 +32,8 @@ Always start from a clean state and confirm you are on the Home screen before na
   - Ensure the driver session starts from the app launch activity
 - Confirm Home screen using existing locators before continuing.
 - If the app may be on a different screen, do not continue until Home is explicitly verified.
-**Navigation Rule:** After any navigation action (tap, back, swipe), always verify the target page with `page.isDisplayed()` before proceeding. Never assume navigation succeeded.
-This makes each new scenario reliable and prevents state leakage from previous tests.
+  **Navigation Rule:** After any navigation action (tap, back, swipe), always verify the target page with `page.isDisplayed()` before proceeding. Never assume navigation succeeded.
+  This makes each new scenario reliable and prevents state leakage from previous tests.
 
 ### Step 1.1 — Get the app's package and activity
 
@@ -152,6 +152,9 @@ When selecting a locator for an interaction (click/tap), **always** ensure the t
 ```
 appium-tests/
 ├── build.gradle.kts
+├── dumps/                               ← UI XML dumps for locator extraction
+├── screenshot-failures/                 ← Screenshots captured on test failure
+├── tools/                               ← Helper scripts (e.g., debug_flow.py)
 ├── src/
 │   └── test/
 │       └── kotlin/
@@ -165,6 +168,18 @@ appium-tests/
     ├── android.json
     └── ios.json                         ← future    
 ```
+
+### ⚠️ Repo Root vs Module Root (CRITICAL)
+
+The structure above is for the **`appium-tests/` module**. In many repos, `appium-tests/` is **NOT** the repository root.
+
+- If you run tests from inside the module (recommended):
+  - `cd appium-tests`
+  - `./gradlew test ...`
+  - Then `System.getProperty("user.dir")` points to `.../appium-tests`, and relative paths like `screenshot-failures/` land in the right place.
+- If you run tests from the repo root (e.g., `./gradlew :appium-tests:test`), be careful with code that assumes the current working directory is the module.
+
+**Rule:** Always save artifacts (screenshots/dumps) relative to the **module directory**, and avoid using `parentFile` tricks that accidentally jump to the repo root.
 
 ---
 
@@ -204,32 +219,94 @@ import io.appium.java_client.android.AndroidDriver
 import io.appium.java_client.android.options.UiAutomator2Options
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.api.extension.ExtensionContext
+import org.junit.jupiter.api.extension.TestExecutionExceptionHandler
+import org.openqa.selenium.OutputType
+import org.openqa.selenium.WebDriver
+import java.io.File
 import java.net.URL
 import java.time.Duration
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 open class BaseTest {
 
-    protected lateinit var driver: AndroidDriver
+  protected lateinit var driver: AndroidDriver
 
-    @BeforeEach
-    fun setUp() {
-        val options = UiAutomator2Options().apply {
-            setPlatformName("Android")
-            setAppPackage("{{APP_PACKAGE}}")       // ← replace with real value from Phase 1
-            setAppActivity("{{APP_ACTIVITY}}")     // ← replace with real value from Phase 1
-            setAutomationName("UiAutomator2")
-            setNewCommandTimeout(Duration.ofSeconds(60))
-            setNoReset(true)
-        }
+  @JvmField
+  @RegisterExtension
+  val failureArtifacts = FailureArtifactsExtension(
+    driverProvider = { if (::driver.isInitialized) driver else null },
+    screenshot = { name -> takeScreenshot(name) },
+    pageSource = { name -> dumpPageSource(name) },
+  )
 
-        driver = AndroidDriver(URL("http://127.0.0.1:4723"), options)
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5))
+  class FailureArtifactsExtension(
+    private val driverProvider: () -> AndroidDriver?,
+    private val screenshot: (String) -> Unit,
+    private val pageSource: (String) -> Unit,
+  ) : TestExecutionExceptionHandler {
+    override fun handleTestExecutionException(context: ExtensionContext, throwable: Throwable) {
+      // IMPORTANT: this runs before @AfterEach, so the driver session is still alive.
+      if (driverProvider() != null) {
+        val safeName = context.displayName
+          .replace(Regex("[^A-Za-z0-9._-]+"), "_")
+          .trim('_')
+          .take(120)
+        screenshot("failed_$safeName")
+        pageSource("failed_$safeName")
+      }
+      throw throwable
+    }
+  }
+
+  @BeforeEach
+  fun setUp() {
+    val options = UiAutomator2Options().apply {
+      setPlatformName("Android")
+      setAppPackage("{{APP_PACKAGE}}")       // ← replace with real value from Phase 1
+      setAppActivity("{{APP_ACTIVITY}}")     // ← replace with real value from Phase 1
+      setAutomationName("UiAutomator2")
+      setNewCommandTimeout(Duration.ofSeconds(60))
+      setNoReset(false)
+      setFullReset(false)
     }
 
-    @AfterEach
-    fun tearDown() {
-        if (::driver.isInitialized) driver.quit()
-    }
+    driver = AndroidDriver(URL("http://127.0.0.1:4723"), options)
+    driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5))
+  }
+
+  @AfterEach
+  fun tearDown() {
+    if (::driver.isInitialized) driver.quit()
+  }
+
+  fun takeScreenshot(fileName: String) {
+    if (!::driver.isInitialized) return
+
+    val screenshot = driver.getScreenshotAs(OutputType.FILE)
+    val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
+    val moduleRoot = File(System.getProperty("user.dir"))
+    val screenshotDir = File(moduleRoot, "screenshot-failures")
+    if (!screenshotDir.exists()) screenshotDir.mkdirs()
+    val destFile = File(screenshotDir, "${fileName}_${timestamp}.png")
+    screenshot.copyTo(destFile)
+    println("Screenshot saved to: ${destFile.absolutePath}")
+  }
+
+  fun dumpPageSource(fileName: String) {
+    if (!::driver.isInitialized) return
+
+    val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
+    val moduleRoot = File(System.getProperty("user.dir"))
+    val dumpsDir = File(moduleRoot, "dumps")
+    if (!dumpsDir.exists()) dumpsDir.mkdirs()
+
+    val destFile = File(dumpsDir, "${fileName}_${timestamp}.xml")
+    destFile.writeText((driver as WebDriver).pageSource)
+    println("Page source saved to: ${destFile.absolutePath}")
+  }
 }
 ```
 
@@ -253,55 +330,55 @@ import java.time.Duration
 
 class LoginPage(private val driver: AndroidDriver) {
 
-    init {
-        PageFactory.initElements(AppiumFieldDecorator(driver), this)
-    }
+  init {
+    PageFactory.initElements(AppiumFieldDecorator(driver), this)
+  }
 
-    private val wait = WebDriverWait(driver, Duration.ofSeconds(10))
+  private val wait = WebDriverWait(driver, Duration.ofSeconds(10))
 
-    // ── Locators (replace with real values from Phase 1) ────────────────────
-    @AndroidFindBy(accessibility = "{{CONTENT_DESC}}")
-    private lateinit var emailField: WebElement
+  // ── Locators (replace with real values from Phase 1) ────────────────────
+  @AndroidFindBy(accessibility = "{{CONTENT_DESC}}")
+  private lateinit var emailField: WebElement
 
-    @AndroidFindBy(accessibility = "{{CONTENT_DESC}}")
-    private lateinit var passwordField: WebElement
+  @AndroidFindBy(accessibility = "{{CONTENT_DESC}}")
+  private lateinit var passwordField: WebElement
 
-    @AndroidFindBy(accessibility = "{{CONTENT_DESC}}")
-    private lateinit var loginButton: WebElement
+  @AndroidFindBy(accessibility = "{{CONTENT_DESC}}")
+  private lateinit var loginButton: WebElement
 
-    @AndroidFindBy(accessibility = "{{CONTENT_DESC}}")
-    private lateinit var errorMessage: WebElement
+  @AndroidFindBy(accessibility = "{{CONTENT_DESC}}")
+  private lateinit var errorMessage: WebElement
 
-    // ── Actions ──────────────────────────────────────────────────────────────
-    fun enterEmail(email: String): LoginPage {
-        wait.until(ExpectedConditions.visibilityOf(emailField))
-        emailField.clear()
-        emailField.sendKeys(email)
-        return this
-    }
+  // ── Actions ──────────────────────────────────────────────────────────────
+  fun enterEmail(email: String): LoginPage {
+    wait.until(ExpectedConditions.visibilityOf(emailField))
+    emailField.clear()
+    emailField.sendKeys(email)
+    return this
+  }
 
-    fun enterPassword(password: String): LoginPage {
-        passwordField.clear()
-        passwordField.sendKeys(password)
-        return this
-    }
+  fun enterPassword(password: String): LoginPage {
+    passwordField.clear()
+    passwordField.sendKeys(password)
+    return this
+  }
 
-    fun tapLogin(): LoginPage {
-        loginButton.click()
-        return this
-    }
+  fun tapLogin(): LoginPage {
+    loginButton.click()
+    return this
+  }
 
-    fun login(email: String, password: String): LoginPage =
-        enterEmail(email).enterPassword(password).tapLogin()
+  fun login(email: String, password: String): LoginPage =
+    enterEmail(email).enterPassword(password).tapLogin()
 
-    fun isErrorVisible(): Boolean =
-        runCatching {
-            wait.until(ExpectedConditions.visibilityOf(errorMessage))
-            true
-        }.getOrDefault(false)
+  fun isErrorVisible(): Boolean =
+    runCatching {
+      wait.until(ExpectedConditions.visibilityOf(errorMessage))
+      true
+    }.getOrDefault(false)
 
-    fun isLoginButtonDisabled(): Boolean =
-        !loginButton.isEnabled
+  fun isLoginButtonDisabled(): Boolean =
+    !loginButton.isEnabled
 }
 ```
 
@@ -322,28 +399,28 @@ import pages.LoginPage
 
 class LoginTest : BaseTest() {
 
-    @Test
-    fun `login with valid credentials navigates to home`() {
-        val loginPage = LoginPage(driver)
-        loginPage.login("user@email.com", "validPassword123")
+  @Test
+  fun `login with valid credentials navigates to home`() {
+    val loginPage = LoginPage(driver)
+    loginPage.login("user@email.com", "validPassword123")
 
-        val homePage = HomePage(driver)
-        assertTrue(homePage.isDisplayed(), "Home screen should be visible after login")
-    }
+    val homePage = HomePage(driver)
+    assertTrue(homePage.isDisplayed(), "Home screen should be visible after login")
+  }
 
-    @Test
-    fun `login with wrong password shows error message`() {
-        val loginPage = LoginPage(driver)
-        loginPage.login("user@email.com", "wrongPassword")
+  @Test
+  fun `login with wrong password shows error message`() {
+    val loginPage = LoginPage(driver)
+    loginPage.login("user@email.com", "wrongPassword")
 
-        assertTrue(loginPage.isErrorVisible(), "Error message should appear for wrong credentials")
-    }
+    assertTrue(loginPage.isErrorVisible(), "Error message should appear for wrong credentials")
+  }
 
-    @Test
-    fun `login button disabled when fields are empty`() {
-        val loginPage = LoginPage(driver)
-        assertTrue(loginPage.isLoginButtonDisabled(), "Login button should be disabled with empty fields")
-    }
+  @Test
+  fun `login button disabled when fields are empty`() {
+    val loginPage = LoginPage(driver)
+    assertTrue(loginPage.isLoginButtonDisabled(), "Login button should be disabled with empty fields")
+  }
 }
 ```
 
@@ -368,8 +445,8 @@ When a test fails with `NoSuchElementException` or `TimeoutException`:
 
 ```kotlin
 driver.findElement(AppiumBy.androidUIAutomator(
-    "new UiSelector().resourceId(\"com.app:id/btn_login\")" +
-    ".className(\"android.widget.Button\")"
+  "new UiSelector().resourceId(\"com.app:id/btn_login\")" +
+          ".className(\"android.widget.Button\")"
 ))
 ```
 
@@ -420,12 +497,12 @@ Use `"appium:app"` to install fresh on each run, or only `appPackage`+`appActivi
 
 ```kotlin
 val options = XCUITestOptions().apply {
-    setPlatformName("iOS")
-    setDeviceName("iPhone 15")
-    setPlatformVersion("17.0")
-    setBundleId("com.yourapp.bundleid")
-    setAutomationName("XCUITest")
-    setNoReset(true)
+  setPlatformName("iOS")
+  setDeviceName("iPhone 15")
+  setPlatformVersion("17.0")
+  setBundleId("com.yourapp.bundleid")
+  setAutomationName("XCUITest")
+  setNoReset(true)
 }
 ```
 

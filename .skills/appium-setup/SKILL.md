@@ -187,4 +187,4 @@ After completing all setup steps, create this file at the project root:
 <!-- list flaky tests or environment quirks -->
 ```
 
-**Next:** Use the `appium-automation` skill for creating test scenarios.
+**Next:** Use the `appium-developer` skill for creating test scenarios.

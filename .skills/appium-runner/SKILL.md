@@ -22,9 +22,27 @@ When running generated tests:
   adb devices
   ```
 - Then check Appium server: `curl http://localhost:4723/status`
-- If Appium not OK, attempt to start: `appium --address 127.0.0.1 --port 4723 & sleep 5 && curl http://localhost:4723/status`
-- If still not OK, report: "Failed to start Appium server."
-- Check app installed: `adb shell pm list packages | grep {{APP_PACKAGE}}`
+- If Appium not OK, attempt to start using nohup to prevent process termination:
+  ```bash
+  export PATH="$PATH:$(npm config get prefix)/bin"
+  nohup appium --address 127.0.0.1 --port 4723 > appium.log 2>&1 &
+  sleep 5
+  curl -s http://127.0.0.1:4723/status
+  ```
+- If still not OK, report: "Failed to start Appium server." 
+- To start the emulator and run tests in a single persistent session (recommended if emulator is not running):
+  ```bash
+  export ANDROID_SDK_ROOT="$HOME/Library/Android/sdk"
+  export PATH="$PATH:$ANDROID_SDK_ROOT/platform-tools:$ANDROID_SDK_ROOT/emulator"
+
+  if ! adb devices | grep -q "emulator-5554"; then
+    nohup emulator -avd Medium_Phone -no-snapshot-load -no-audio -no-boot-anim > emulator.log 2>&1 &
+    adb wait-for-device
+    adb shell 'while [[ $(getprop sys.boot_completed) != 1 ]]; do sleep 5; done'
+  fi
+
+  ./gradlew :appium-tests:cleanTest :appium-tests:test --tests "tests.YourTestClass"
+  ```
 - If any check fails, invoke `appium-setup` to fix.
 
 ### Step 2 — Run Tests
